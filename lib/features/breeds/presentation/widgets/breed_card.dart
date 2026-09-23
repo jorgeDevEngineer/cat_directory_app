@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/widgets/cat_image_helper.dart';
 
 class BreedCard extends StatefulWidget {
   final String breedName;
@@ -96,29 +97,12 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // Exclude avatar emoji from screen readers as text semantics covers it
-                    ExcludeSemantics(
-                      child: Hero(
-                        tag: 'avatar_${widget.breedName}',
-                        child: Container(
-                          width: 52,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              flag,
-                              style: const TextStyle(fontSize: 24),
-                            ),
-                          ),
-                        ),
-                      ),
+                    // Cat Photo Avatar with Fallback to Flag Emoji
+                    CatImageHelper.buildAvatar(
+                      breedName: widget.breedName,
+                      countryFlag: flag,
+                      size: 56,
+                      heroTag: 'avatar_${widget.breedName}',
                     ),
                     const SizedBox(width: 16),
                     Expanded(

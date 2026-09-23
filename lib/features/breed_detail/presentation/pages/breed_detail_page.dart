@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/widgets/cat_image_helper.dart';
 import '../../../breeds/domain/entities/breed.dart';
 import '../cubit/breed_detail_cubit.dart';
 import '../cubit/breed_detail_state.dart';
@@ -36,9 +37,40 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
     super.dispose();
   }
 
+  String _getCountryFlag(String country) {
+    if (country.isEmpty) return '🐾';
+    switch (country.toLowerCase()) {
+      case 'ethiopia':
+        return '🇪🇹';
+      case 'greece':
+        return '🇬🇷';
+      case 'united states':
+      case 'usa':
+        return '🇺🇸';
+      case 'united kingdom':
+      case 'uk':
+        return '🇬🇧';
+      case 'thailand':
+        return '🇹🇭';
+      case 'russia':
+        return '🇷🇺';
+      case 'japan':
+        return '🇯🇵';
+      case 'egypt':
+        return '🇪🇬';
+      case 'france':
+        return '🇫🇷';
+      case 'turkey':
+        return '🇹🇷';
+      default:
+        return '📍';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final breed = widget.breed;
+    final flag = breed != null ? _getCountryFlag(breed.country) : '🐾';
 
     return Scaffold(
       appBar: AppBar(
@@ -64,32 +96,13 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Avatar Header
+            // High-resolution Cat Photo Avatar in Detail view
             Center(
-              child: Hero(
-                tag: 'avatar_${widget.breedName}',
-                child: Container(
-                  width: 90,
-                  height: 90,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
-                        blurRadius: 16,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
-                  ),
-                  child: const Center(
-                    child: Text('🐱', style: TextStyle(fontSize: 44)),
-                  ),
-                ),
+              child: CatImageHelper.buildAvatar(
+                breedName: widget.breedName,
+                countryFlag: flag,
+                size: 110,
+                heroTag: 'avatar_${widget.breedName}',
               ),
             ),
             const SizedBox(height: 24),
