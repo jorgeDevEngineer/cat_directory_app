@@ -12,7 +12,7 @@
 
 | MiauPedia Home (Light) | Modo Oscuro (Dark) | Detalle de Raza |
 |:---:|:---:|:---:|
-| ![Home Light](assets/images/app_logo.jpg) | ![Dark Mode](assets/images/app_logo.jpg) | ![Detail](assets/images/app_logo.jpg) |
+| <img src="assets/images/screenshot_home_light.jpg" width="250" /> | <img src="assets/images/screenshot_home_dark.jpg" width="250" /> | <img src="assets/images/screenshot_detail.jpg" width="250" /> |
 
 ---
 
@@ -72,12 +72,46 @@ flutter test
 
 ---
 
-## ⚡ Auditoría de Performance
+## ⚡ Auditoría de Performance & Evidencia
 
-- **Frames por Segundo (FPS)**: Mantenimiento constante a **60/120 FPS** sin frames perdidos durante el scroll rápido gracias a la optimización de `ListView.builder` y la reutilización de imágenes cacheadas.
-- **Uso de Memoria**: Liberación automática de controladores (`ScrollController`, `AnimationController`, `StreamSubscription`) en `dispose()`.
-- **Compilación Release (APK Size)**:
-  - Tamaño final del APK Release: **~18.4 MB** (Optimizado con R8 y árbol de código Tree Shaking).
+### 📈 Traza de Rendimiento en Flutter DevTools (Impeller Engine)
+- **Tasa de Refresco (60 FPS promedio)**: La traza de rendimiento obtenida en DevTools (*Performance Profile*) evidencia un renderizado continuo y fluido del `ListView.builder` manteniendo el tiempo de UI y Rasterization por debajo de los **16.6 ms (60 FPS)** durante el scroll infinito.
+- **Sin Jank Significativo**: La reutilización de celdas y el caché en disco con `CachedNetworkImage` garantizan que no haya caídas sostenidas ni degradación de memoria.
+
+![Flutter DevTools Performance Profile Trace](assets/images/devtools_performance.png)
+
+```text
+Flutter DevTools Performance Summary:
+Engine: Impeller
+Average Frame Rate: ~56 - 60 FPS
+UI / Raster Frame Time: < 8 - 14 ms
+```
+
+### 📦 Optimización de Tamaño de APK (`flutter build apk --analyze-size`)
+Ejecución de compilación optimizada para arquitectura `android-arm64`:
+- **Tree-Shaking de Fuentes (Icons)**:
+  - `CupertinoIcons.ttf`: Reducido de 257,628 a 848 bytes (**99.7% de reducción**).
+  - `MaterialIcons-Regular.otf`: Reducido de 1,645,184 a 4,428 bytes (**99.7% de reducción**).
+- **Tamaño APK Release Final**: **17.7 MB (18 MB total comprimido)**.
+
+```text
+app-release.apk (total compressed)                                         18 MB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  assets/
+    flutter_assets                                                        235 KB
+  classes.dex                                                             244 KB
+  lib/
+    arm64-v8a                                                              17 MB
+    Dart AOT symbols accounted decompressed size                            6 MB
+      package:flutter                                                       3 MB
+      dart:core                                                           291 KB
+      package:hive_ce                                                      97 KB
+      package:cat_directory_app                                            82 KB
+      package:material_color_utilities                                     70 KB
+      package:go_router                                                    59 KB
+      package:dio                                                          51 KB
+      package:flutter_cache_manager                                        32 KB
+```
 
 ---
 

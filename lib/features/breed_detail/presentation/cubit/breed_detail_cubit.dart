@@ -14,7 +14,7 @@ class BreedDetailCubit extends Cubit<BreedDetailState> {
       final fact = await factRepository.getRandomFact(maxLength: maxLength);
       emit(BreedDetailFactLoaded(fact));
     } catch (e) {
-      emit(BreedDetailFactError(e.toString()));
+      emit(const BreedDetailFactError('You must connect to the internet to get a new random fact.'));
     }
   }
 }

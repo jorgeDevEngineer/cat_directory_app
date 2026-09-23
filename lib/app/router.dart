@@ -28,7 +28,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/breed/:name',
       pageBuilder: (context, state) {
-        final name = Uri.decodeComponent(state.pathParameters['name'] ?? '');
+        final rawName = state.pathParameters['name'] ?? '';
+        String name;
+        try {
+          name = Uri.decodeComponent(rawName);
+        } catch (_) {
+          name = rawName;
+        }
         final breed = state.extra as Breed?;
 
         return CustomTransitionPage(

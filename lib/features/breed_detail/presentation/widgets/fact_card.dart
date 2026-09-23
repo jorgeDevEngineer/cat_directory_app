@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/localization/localization_service.dart';
 
 class FactCard extends StatelessWidget {
   final bool isLoading;
@@ -16,6 +17,7 @@ class FactCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = LocalizationService.instance;
     return Semantics(
       label: isLoading
           ? 'Dato curioso cargando'
@@ -61,7 +63,7 @@ class FactCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  'Dato Curioso Aleatorio',
+                  loc.isSpanish ? 'Dato Curioso Aleatorio' : 'Random Cat Fact',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).colorScheme.primary,
@@ -110,15 +112,26 @@ class FactCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          errorMessage ?? 'Error al cargar el dato curioso.',
-          style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 14),
+        Row(
+          children: [
+            Icon(Icons.wifi_off_rounded, color: Theme.of(context).colorScheme.outline, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                errorMessage ?? 'You must connect to the internet to get a new random fact.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         TextButton.icon(
           onPressed: onRetry,
           icon: const Icon(Icons.refresh_rounded, size: 18),
-          label: const Text('Reintentar'),
+          label: const Text('Retry'),
           style: TextButton.styleFrom(
             foregroundColor: Theme.of(context).colorScheme.primary,
           ),
@@ -128,11 +141,13 @@ class FactCard extends StatelessWidget {
   }
 
   Widget _buildFactText(BuildContext context, String text) {
+    final loc = LocalizationService.instance;
+    final translated = loc.translateFact(text);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: Text(
-        '"$text"',
-        key: ValueKey(text),
+        '"$translated"',
+        key: ValueKey(translated),
         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontStyle: FontStyle.italic,
               height: 1.4,

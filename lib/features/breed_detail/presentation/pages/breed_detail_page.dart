@@ -39,34 +39,43 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
     super.dispose();
   }
 
+  String _cleanCountryName(String country) {
+    if (country.isEmpty) return 'Unknown';
+    final index = country.indexOf('(');
+    String cleaned = index != -1 ? country.substring(0, index) : country;
+    return cleaned.trim();
+  }
+
   String _getCountryFlag(String country) {
     if (country.isEmpty) return '🐾';
-    switch (country.toLowerCase()) {
-      case 'ethiopia':
-        return '🇪🇹';
-      case 'greece':
-        return '🇬🇷';
-      case 'united states':
-      case 'usa':
-        return '🇺🇸';
-      case 'united kingdom':
-      case 'uk':
-        return '🇬🇧';
-      case 'thailand':
-        return '🇹🇭';
-      case 'russia':
-        return '🇷🇺';
-      case 'japan':
-        return '🇯🇵';
-      case 'egypt':
-        return '🇪🇬';
-      case 'france':
-        return '🇫🇷';
-      case 'turkey':
-        return '🇹🇷';
-      default:
-        return '📍';
-    }
+    final lower = country.toLowerCase().trim();
+
+    if (lower.contains('united kingdom') || lower.contains('uk') || lower.contains('england')) return '🇬🇧';
+    if (lower.contains('united states') || lower.contains('usa')) return '🇺🇸';
+    if (lower.contains('ethiopia')) return '🇪🇹';
+    if (lower.contains('greece')) return '🇬🇷';
+    if (lower.contains('thailand')) return '🇹🇭';
+    if (lower.contains('russia')) return '🇷🇺';
+    if (lower.contains('japan')) return '🇯🇵';
+    if (lower.contains('egypt')) return '🇪🇬';
+    if (lower.contains('france')) return '🇫🇷';
+    if (lower.contains('turkey')) return '🇹🇷';
+    if (lower.contains('canada')) return '🇨🇦';
+    if (lower.contains('china')) return '🇨🇳';
+    if (lower.contains('iran')) return '🇮🇷';
+    if (lower.contains('burma') || lower.contains('myanmar')) return '🇲🇲';
+    if (lower.contains('somalia')) return '🇸🇴';
+    if (lower.contains('singapore')) return '🇸🇬';
+    if (lower.contains('australia')) return '🇦🇺';
+    if (lower.contains('isle of man')) return '🇮🇲';
+    if (lower.contains('cyprus')) return '🇨🇾';
+    if (lower.contains('brazil')) return '🇧🇷';
+    if (lower.contains('germany')) return '🇩🇪';
+    if (lower.contains('norway')) return '🇳🇴';
+    if (lower.contains('sweden')) return '🇸🇪';
+    if (lower.contains('ukraine')) return '🇺🇦';
+
+    return '📍';
   }
 
   @override
@@ -112,7 +121,7 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
                 const SizedBox(height: 24),
 
                 if (breed != null) ...[
-                  _buildInfoRow(context, Icons.public_rounded, loc.countryOfOrigin, breed.country),
+                  _buildInfoRow(context, Icons.public_rounded, loc.countryOfOrigin, _cleanCountryName(breed.country)),
                   _buildInfoRow(context, Icons.history_edu_rounded, loc.origin, loc.translateValue(breed.origin)),
                   _buildInfoRow(context, Icons.texture_rounded, loc.coat, loc.translateValue(breed.coat)),
                   _buildInfoRow(context, Icons.category_rounded, loc.pattern, loc.translateValue(breed.pattern)),

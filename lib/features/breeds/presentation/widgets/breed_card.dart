@@ -45,34 +45,44 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
     super.dispose();
   }
 
+  String _cleanCountryName(String country) {
+    if (country.isEmpty) return 'Unknown';
+    // Clean text before parentheses or extra details e.g. "United Kingdom (England)" -> "United Kingdom"
+    final index = country.indexOf('(');
+    String cleaned = index != -1 ? country.substring(0, index) : country;
+    return cleaned.trim();
+  }
+
   String _getCountryFlag(String country) {
     if (country.isEmpty) return '🐾';
-    switch (country.toLowerCase()) {
-      case 'ethiopia':
-        return '🇪🇹';
-      case 'greece':
-        return '🇬🇷';
-      case 'united states':
-      case 'usa':
-        return '🇺🇸';
-      case 'united kingdom':
-      case 'uk':
-        return '🇬🇧';
-      case 'thailand':
-        return '🇹🇭';
-      case 'russia':
-        return '🇷🇺';
-      case 'japan':
-        return '🇯🇵';
-      case 'egypt':
-        return '🇪🇬';
-      case 'france':
-        return '🇫🇷';
-      case 'turkey':
-        return '🇹🇷';
-      default:
-        return '📍';
-    }
+    final lower = country.toLowerCase().trim();
+
+    if (lower.contains('united kingdom') || lower.contains('uk') || lower.contains('england')) return '🇬🇧';
+    if (lower.contains('united states') || lower.contains('usa')) return '🇺🇸';
+    if (lower.contains('ethiopia')) return '🇪🇹';
+    if (lower.contains('greece')) return '🇬🇷';
+    if (lower.contains('thailand')) return '🇹🇭';
+    if (lower.contains('russia')) return '🇷🇺';
+    if (lower.contains('japan')) return '🇯🇵';
+    if (lower.contains('egypt')) return '🇪🇬';
+    if (lower.contains('france')) return '🇫🇷';
+    if (lower.contains('turkey')) return '🇹🇷';
+    if (lower.contains('canada')) return '🇨🇦';
+    if (lower.contains('china')) return '🇨🇳';
+    if (lower.contains('iran')) return '🇮🇷';
+    if (lower.contains('burma') || lower.contains('myanmar')) return '🇲🇲';
+    if (lower.contains('somalia')) return '🇸🇴';
+    if (lower.contains('singapore')) return '🇸🇬';
+    if (lower.contains('australia')) return '🇦🇺';
+    if (lower.contains('isle of man')) return '🇮🇲';
+    if (lower.contains('cyprus')) return '🇨🇾';
+    if (lower.contains('brazil')) return '🇧🇷';
+    if (lower.contains('germany')) return '🇩🇪';
+    if (lower.contains('norway')) return '🇳🇴';
+    if (lower.contains('sweden')) return '🇸🇪';
+    if (lower.contains('ukraine')) return '🇺🇦';
+
+    return '📍';
   }
 
   @override
@@ -123,7 +133,7 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            '$flag ${loc.translateCountry(widget.country)}',
+                            '$flag ${_cleanCountryName(widget.country)}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 13,
@@ -163,10 +173,20 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
                               const SizedBox(height: 8),
                               Wrap(
                                 spacing: 8,
-                                runSpacing: 4,
+                                runSpacing: 6,
                                 children: [
-                                  _buildChip(context, loc.translateValue(widget.coat)),
-                                  _buildChip(context, loc.translateValue(widget.pattern)),
+                                  if (widget.coat.isNotEmpty)
+                                    _buildChip(
+                                      context,
+                                      icon: Icons.texture_rounded,
+                                      label: '${loc.coat}: ${loc.translateValue(widget.coat)}',
+                                    ),
+                                  if (widget.pattern.isNotEmpty)
+                                    _buildChip(
+                                      context,
+                                      icon: Icons.category_rounded,
+                                      label: '${loc.pattern}: ${loc.translateValue(widget.pattern)}',
+                                    ),
                                 ],
                               ),
                             ],
@@ -196,21 +216,31 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
     );
   }
 
-  Widget _buildChip(BuildContext context, String text) {
-    if (text.isEmpty) return const SizedBox.shrink();
+  Widget _buildChip(BuildContext context, {required IconData icon, required String label}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Theme.of(context).colorScheme.primary,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+          width: 0.8,
         ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+        ],
       ),
     );
   }
