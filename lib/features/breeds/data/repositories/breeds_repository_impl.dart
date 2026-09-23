@@ -36,7 +36,7 @@ class BreedsRepositoryImpl implements BreedsRepository {
 
     // 2. Cache logic: Fresh cache -> Return immediately
     if (cached != null && !cached.isExpired && !cached.isStale) {
-      return _resultFromCache(cached.data, page, isFromCache: false, lastUpdated: lastUpdated);
+      return _resultFromCache(cached.data, page, isFromCache: !hasNet, lastUpdated: lastUpdated);
     }
 
     // 3. Stale cache: return cached data immediately, update in background if online
