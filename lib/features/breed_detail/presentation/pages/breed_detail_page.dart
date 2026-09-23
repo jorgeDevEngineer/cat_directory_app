@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/localization/localization_service.dart';
 import '../../../../core/widgets/cat_image_helper.dart';
 import '../../../breeds/domain/entities/breed.dart';
 import '../cubit/breed_detail_cubit.dart';
@@ -23,6 +24,7 @@ class BreedDetailPage extends StatefulWidget {
 
 class _BreedDetailPageState extends State<BreedDetailPage> {
   late BreedDetailCubit _cubit;
+  final loc = LocalizationService.instance;
 
   @override
   void initState() {
@@ -72,76 +74,78 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
     final breed = widget.breed;
     final flag = breed != null ? _getCountryFlag(breed.country) : '🐾';
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Hero(
-          tag: 'name_${widget.breedName}',
-          flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
-            return Material(
-              color: Colors.transparent,
-              child: toHeroContext.widget,
-            );
-          },
-          child: Text(
-            widget.breedName,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-          ),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // High-resolution Cat Photo Avatar in Detail view
-            Center(
-              child: CatImageHelper.buildAvatar(
-                breedName: widget.breedName,
-                countryFlag: flag,
-                size: 110,
-                heroTag: 'avatar_${widget.breedName}',
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Breed info cards
-            if (breed != null) ...[
-              _buildInfoRow(context, Icons.public_rounded, 'País de Origen', breed.country),
-              _buildInfoRow(context, Icons.history_edu_rounded, 'Origen', breed.origin),
-              _buildInfoRow(context, Icons.texture_rounded, 'Pelaje (Coat)', breed.coat),
-              _buildInfoRow(context, Icons.category_rounded, 'Patrón (Pattern)', breed.pattern),
-            ],
-
-            const SizedBox(height: 24),
-
-            // Random Fact Section with Cubit
-            BlocBuilder<BreedDetailCubit, BreedDetailState>(
-              bloc: _cubit,
-              builder: (context, state) {
-                return FactCard(
-                  isLoading: state is BreedDetailFactLoading,
-                  factText: state is BreedDetailFactLoaded ? state.fact.fact : null,
-                  errorMessage: state is BreedDetailFactError ? state.message : null,
-                  onRetry: () => _cubit.loadRandomFact(),
+    return ListenableBuilder(
+      listenable: loc,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Hero(
+              tag: 'name_${widget.breedName}',
+              flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
+                return Material(
+                  color: Colors.transparent,
+                  child: toHeroContext.widget,
                 );
               },
-            ),
-
-            const SizedBox(height: 20),
-
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: () => _cubit.loadRandomFact(),
-                icon: const Icon(Icons.casino_rounded),
-                label: const Text('Obtener otro Dato Curioso'),
+              child: Text(
+                widget.breedName,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: CatImageHelper.buildAvatar(
+                    breedName: widget.breedName,
+                    countryFlag: flag,
+                    size: 110,
+                    heroTag: 'avatar_${widget.breedName}',
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                if (breed != null) ...[
+                  _buildInfoRow(context, Icons.public_rounded, loc.countryOfOrigin, breed.country),
+                  _buildInfoRow(context, Icons.history_edu_rounded, loc.origin, loc.translateValue(breed.origin)),
+                  _buildInfoRow(context, Icons.texture_rounded, loc.coat, loc.translateValue(breed.coat)),
+                  _buildInfoRow(context, Icons.category_rounded, loc.pattern, loc.translateValue(breed.pattern)),
+                ],
+
+                const SizedBox(height: 24),
+
+                BlocBuilder<BreedDetailCubit, BreedDetailState>(
+                  bloc: _cubit,
+                  builder: (context, state) {
+                    return FactCard(
+                      isLoading: state is BreedDetailFactLoading,
+                      factText: state is BreedDetailFactLoaded ? state.fact.fact : null,
+                      errorMessage: state is BreedDetailFactError ? state.message : null,
+                      onRetry: () => _cubit.loadRandomFact(),
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 20),
+
+                Center(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _cubit.loadRandomFact(),
+                    icon: const Icon(Icons.casino_rounded),
+                    label: Text(loc.getAnotherFact),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

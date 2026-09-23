@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../app/theme/app_colors.dart';
 import '../../../../core/lifecycle/app_lifecycle_observer.dart';
+import '../../../../core/localization/localization_service.dart';
 import '../../../../core/widgets/connectivity_banner.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../../core/widgets/language_toggle_button.dart';
 import '../bloc/breeds_bloc.dart';
 import '../bloc/breeds_event.dart';
 import '../bloc/breeds_state.dart';
@@ -23,6 +24,7 @@ class BreedsPage extends StatefulWidget {
 class _BreedsPageState extends State<BreedsPage> {
   final ScrollController _scrollController = ScrollController();
   late AppLifecycleObserver _lifecycleObserver;
+  final loc = LocalizationService.instance;
 
   @override
   void initState() {
@@ -55,81 +57,100 @@ class _BreedsPageState extends State<BreedsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              'assets/images/app_logo.jpg',
-              height: 28,
-              width: 28,
-              errorBuilder: (_, __, ___) => Icon(Icons.pets, color: Theme.of(context).colorScheme.primary),
+    return ListenableBuilder(
+      listenable: loc,
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/images/app_logo.jpg',
+                  height: 28,
+                  width: 28,
+                  errorBuilder: (_, __, ___) => Icon(Icons.pets, color: Theme.of(context).colorScheme.primary),
+                ),
+                const SizedBox(width: 8),
+                Text(loc.appTitle),
+              ],
             ),
-            const SizedBox(width: 8),
-            const Text('MiauPedia'),
-          ],
-        ),
-      ),
-      body: BlocConsumer<BreedsBloc, BreedsState>(
-        listener: (context, state) {
-          if (state.errorMessage != null && state.breeds.isNotEmpty) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage!),
-                backgroundColor: Theme.of(context).colorScheme.error,
-                action: SnackBarAction(
-                  label: 'Reintentar',
-                  textColor: Colors.white,
-                  onPressed: () {
-                    context.read<BreedsBloc>().add(const BreedsNextPageRequested());
-                  },
-                ),
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          return Column(
-            children: [
-              CustomSearchBar(
-                query: state.searchQuery,
-                onChanged: (value) {
-                  context.read<BreedsBloc>().add(BreedsSearchQueryChanged(value));
-                },
-                onClear: () {
-                  context.read<BreedsBloc>().add(const BreedsSearchQueryChanged(''));
-                },
-              ),
-              ConnectivityBanner(isOffline: state.isFromCache),
-              if (state.isFromCache && state.lastUpdated != null)
-                _buildLastUpdatedHeader(state.lastUpdated!),
-              Expanded(
-                child: RefreshIndicator(
-                  color: Theme.of(context).colorScheme.primary,
-                  onRefresh: () async {
-                    context.read<BreedsBloc>().add(const BreedsRefreshRequested());
-                  },
-                  child: _buildBody(state),
-                ),
+            actions: const [
+              Padding(
+                padding: EdgeInsets.only(right: 16),
+                child: LanguageToggleButton(),
               ),
             ],
-          );
-        },
-      ),
+          ),
+          body: BlocConsumer<BreedsBloc, BreedsState>(
+            listener: (context, state) {
+              if (state.errorMessage != null && state.breeds.isNotEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.errorMessage!),
+                    backgroundColor: Theme.of(context).colorScheme.error,
+                    action: SnackBarAction(
+                      label: loc.retry,
+                      textColor: Colors.white,
+                      onPressed: () {
+                        context.read<BreedsBloc>().add(const BreedsNextPageRequested());
+                      },
+                    ),
+                  ),
+                );
+              }
+            },
+            builder: (context, state) {
+              return Column(
+                children: [
+                  CustomSearchBar(
+                    query: state.searchQuery,
+                    onChanged: (value) {
+                      context.read<BreedsBloc>().add(BreedsSearchQueryChanged(value));
+                    },
+                    onClear: () {
+                      context.read<BreedsBloc>().add(const BreedsSearchQueryChanged(''));
+                    },
+                  ),
+                  ConnectivityBanner(isOffline: state.isFromCache),
+                  if (state.isFromCache && state.lastUpdated != null)
+                    _buildLastUpdatedHeader(state.lastUpdated!),
+                  Expanded(
+                    child: RefreshIndicator(
+                      color: Theme.of(context).colorScheme.primary,
+                      onRefresh: () async {
+                        // Reset scroll position to top on manual pull-to-refresh to prevent blank scroll offsets
+                        if (_scrollController.hasClients) {
+                          _scrollController.animateTo(
+                            0,
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        }
+                        context.read<BreedsBloc>().add(const BreedsRefreshRequested());
+                      },
+                      child: _buildBody(state),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
     );
   }
 
   Widget _buildLastUpdatedHeader(DateTime lastUpdated) {
     final diff = DateTime.now().difference(lastUpdated).inMinutes;
-    final timeText = diff > 0 ? 'hace $diff min' : 'hace un momento';
+    final timeText = diff > 0 ? loc.agoMin.replaceAll('{min}', '$diff') : loc.justNow;
 
     return Container(
       width: double.infinity,
       color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       child: Text(
-        'Última actualización: $timeText',
+        '${loc.lastUpdated}: $timeText',
         textAlign: TextAlign.center,
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               fontSize: 11,
@@ -142,7 +163,7 @@ class _BreedsPageState extends State<BreedsPage> {
   Widget _buildBody(BreedsState state) {
     if (state.isLoading) {
       return Semantics(
-        label: 'Cargando razas de gato',
+        label: loc.isSpanish ? 'Cargando razas de gato' : 'Loading cat breeds',
         child: Shimmer.fromColors(
           baseColor: Colors.grey.shade300,
           highlightColor: Colors.grey.shade100,
@@ -156,7 +177,7 @@ class _BreedsPageState extends State<BreedsPage> {
 
     if (state.errorMessage != null && state.breeds.isEmpty) {
       return Semantics(
-        label: 'Error al cargar razas de gato',
+        label: loc.isSpanish ? 'Error al cargar razas de gato' : 'Error loading cat breeds',
         child: ErrorView(
           message: state.errorMessage!,
           type: ErrorType.noConnection,
@@ -168,8 +189,8 @@ class _BreedsPageState extends State<BreedsPage> {
     }
 
     if (state.filteredBreeds.isEmpty) {
-      return const Center(
-        child: Text('No se encontraron razas de gato.'),
+      return Center(
+        child: Text(loc.noResults),
       );
     }
 

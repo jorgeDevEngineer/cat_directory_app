@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/widgets/cat_image_helper.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/localization_service.dart';
+import '../../domain/entities/breed.dart';
 
 class BreedCard extends StatefulWidget {
   final String breedName;
@@ -76,6 +78,7 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final flag = _getCountryFlag(widget.country);
+    final loc = LocalizationService.instance;
 
     return MergeSemantics(
       child: Semantics(
@@ -97,12 +100,26 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // Cat Photo Avatar with Fallback to Flag Emoji
-                    CatImageHelper.buildAvatar(
-                      breedName: widget.breedName,
-                      countryFlag: flag,
-                      size: 56,
-                      heroTag: 'avatar_${widget.breedName}',
+                    Hero(
+                      tag: 'avatar_${widget.breedName}',
+                      child: Container(
+                        width: 54,
+                        height: 54,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).colorScheme.primary,
+                            width: 1.5,
+                          ),
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                        ),
+                        child: Center(
+                          child: Text(
+                            flag,
+                            style: const TextStyle(fontSize: 26),
+                          ),
+                        ),
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
@@ -133,8 +150,8 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
                           Wrap(
                             spacing: 6,
                             children: [
-                              _buildChip(context, widget.coat),
-                              _buildChip(context, widget.pattern),
+                              _buildChip(context, loc.translateValue(widget.coat)),
+                              _buildChip(context, loc.translateValue(widget.pattern)),
                             ],
                           ),
                         ],
