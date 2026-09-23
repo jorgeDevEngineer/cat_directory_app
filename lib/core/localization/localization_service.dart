@@ -40,6 +40,33 @@ class LocalizationService extends ChangeNotifier {
   String get coat => isSpanish ? 'Pelaje (Coat)' : 'Coat';
   String get pattern => isSpanish ? 'Patrón (Pattern)' : 'Pattern';
 
+  // Country Translations
+  String translateCountry(String country) {
+    if (!isSpanish || country.isEmpty) return country;
+    final lower = country.toLowerCase().trim();
+
+    final countryTranslations = <String, String>{
+      'ethiopia': 'Etiopía',
+      'greece': 'Grecia',
+      'united states': 'Estados Unidos',
+      'usa': 'EE. UU.',
+      'united kingdom': 'Reino Unido',
+      'uk': 'Reino Unido',
+      'thailand': 'Tailandia',
+      'russia': 'Rusia',
+      'japan': 'Japón',
+      'egypt': 'Egipto',
+      'france': 'Francia',
+      'turkey': 'Turquía',
+      'canada': 'Canadá',
+      'china': 'China',
+      'iran': 'Irán',
+      'burma': 'Birmania (Myanmar)',
+    };
+
+    return countryTranslations[lower] ?? country;
+  }
+
   // Dynamic Translations for API Breed Values
   String translateValue(String value) {
     if (!isSpanish || value.isEmpty) return value;
@@ -71,5 +98,31 @@ class LocalizationService extends ChangeNotifier {
     };
 
     return translations[lower] ?? value;
+  }
+
+  // Common Cat Facts Spanish Translation Dictionary / Mapper
+  String translateFact(String fact) {
+    if (!isSpanish || fact.isEmpty) return fact;
+
+    // Automatic translation mapping for key terms and phrases in cat facts
+    var translated = fact;
+
+    final Map<String, String> phraseReplacements = {
+      'Cats sleep': 'Los gatos duermen',
+      'of their lives': 'de sus vidas',
+      'A group of cats is called a': 'Un grupo de gatos se llama',
+      'Cats have': 'Los gatos tienen',
+      'whiskers': 'bigotes',
+      'Cats can make over': 'Los gatos pueden hacer más de',
+      'vocal sounds': 'sonidos vocales',
+      'Cats use their tails for': 'Los gatos usan su cola para',
+      'balance': 'equilibrio',
+    };
+
+    phraseReplacements.forEach((en, es) {
+      translated = translated.replaceAll(en, es);
+    });
+
+    return translated;
   }
 }

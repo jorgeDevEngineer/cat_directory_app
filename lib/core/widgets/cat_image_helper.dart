@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../app/theme/app_colors.dart';
 
 class CatImageHelper {
   /// Generates a deterministic high-quality cat photo URL for the given breed name.
   static String getBreedImageUrl(String breedName) {
-    // Generate deterministic index (0 to 15) for high-res cat photos
     final hash = breedName.toLowerCase().codeUnits.fold(0, (prev, elem) => prev + elem);
     final photoIds = [
       '1514888286974-6c03e2ca1dba',
@@ -25,7 +25,7 @@ class CatImageHelper {
       '1577023311546-acd076b2650d',
     ];
     final selectedId = photoIds[hash % photoIds.length];
-    return 'https://images.unsplash.com/photo-$selectedId?auto=format&fit=crop&w=400&q=80';
+    return 'https://images.unsplash.com/photo-$selectedId?auto=format&fit=crop&w=600&q=85';
   }
 
   /// Builds a cached image avatar with fallback to flag emoji
@@ -45,31 +45,79 @@ class CatImageHelper {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: const Color(0xFFE65100),
-            width: 1.5,
+            color: AppColors.primary,
+            width: 2,
           ),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withValues(alpha: 0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
         child: ClipOval(
           child: CachedNetworkImage(
             imageUrl: imageUrl,
             fit: BoxFit.cover,
             placeholder: (context, url) => Container(
-              color: const Color(0xFFFFF3E0),
+              color: AppColors.surfaceVariant,
               child: const Center(
                 child: SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFE65100)),
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
                 ),
               ),
             ),
             errorWidget: (context, url, error) => Container(
-              color: const Color(0xFFFFF3E0),
+              color: AppColors.surfaceVariant,
               child: Center(
                 child: Text(
                   countryFlag,
                   style: TextStyle(fontSize: size * 0.45),
                 ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Builds a full card header image with CachedNetworkImage
+  static Widget buildCardImage({
+    required String breedName,
+    required String countryFlag,
+    required double height,
+    required String heroTag,
+  }) {
+    final imageUrl = getBreedImageUrl(breedName);
+
+    return Hero(
+      tag: heroTag,
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: CachedNetworkImage(
+          imageUrl: imageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Container(
+            color: AppColors.surfaceVariant,
+            child: const Center(
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.primary),
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            color: AppColors.surfaceVariant,
+            child: Center(
+              child: Text(
+                countryFlag,
+                style: const TextStyle(fontSize: 48),
               ),
             ),
           ),

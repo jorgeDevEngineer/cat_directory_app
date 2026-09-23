@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/localization_service.dart';
-import '../../domain/entities/breed.dart';
+import '../../../../core/widgets/cat_image_helper.dart';
 
 class BreedCard extends StatefulWidget {
   final String breedName;
@@ -82,7 +82,7 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
 
     return MergeSemantics(
       child: Semantics(
-        label: 'Raza ${widget.breedName} de ${widget.country}',
+        label: 'Raza ${widget.breedName} de ${loc.translateCountry(widget.country)}',
         button: true,
         hint: 'Toca para ver los detalles de esta raza',
         child: GestureDetector(
@@ -95,77 +95,99 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
           child: ScaleTransition(
             scale: _scaleAnimation,
             child: Card(
-              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Hero(
-                      tag: 'avatar_${widget.breedName}',
-                      child: Container(
-                        width: 54,
-                        height: 54,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 1.5,
-                          ),
-                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                        ),
-                        child: Center(
-                          child: Text(
-                            flag,
-                            style: const TextStyle(fontSize: 26),
-                          ),
-                        ),
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              clipBehavior: Clip.antiAlias,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Full Cover Cat Image with Cache
+                  Stack(
+                    children: [
+                      CatImageHelper.buildCardImage(
+                        breedName: widget.breedName,
+                        countryFlag: flag,
+                        height: 180,
+                        heroTag: 'avatar_${widget.breedName}',
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Hero(
-                            tag: 'name_${widget.breedName}',
-                            flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
-                              return Material(
-                                color: Colors.transparent,
-                                child: toHeroContext.widget,
-                              );
-                            },
-                            child: Text(
-                              widget.breedName,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                      Positioned(
+                        top: 12,
+                        right: 12,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.65),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            '$flag ${loc.translateCountry(widget.country)}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            '$flag ${widget.country}',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                          const SizedBox(height: 6),
-                          Wrap(
-                            spacing: 6,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  // Card Info Content
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildChip(context, loc.translateValue(widget.coat)),
-                              _buildChip(context, loc.translateValue(widget.pattern)),
+                              Hero(
+                                tag: 'name_${widget.breedName}',
+                                flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
+                                  return Material(
+                                    color: Colors.transparent,
+                                    child: toHeroContext.widget,
+                                  );
+                                },
+                                child: Text(
+                                  widget.breedName,
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 4,
+                                children: [
+                                  _buildChip(context, loc.translateValue(widget.coat)),
+                                  _buildChip(context, loc.translateValue(widget.pattern)),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 20,
+                          ),
+                        ),
+                      ],
                     ),
-                    ExcludeSemantics(
-                      child: Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 16,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -177,16 +199,16 @@ class _BreedCardState extends State<BreedCard> with SingleTickerProviderStateMix
   Widget _buildChip(BuildContext context, String text) {
     if (text.isEmpty) return const SizedBox.shrink();
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
