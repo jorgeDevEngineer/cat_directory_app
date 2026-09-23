@@ -7,6 +7,7 @@ import '../../../../core/localization/localization_service.dart';
 import '../../../../core/widgets/connectivity_banner.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/language_toggle_button.dart';
+import '../../../../core/widgets/theme_toggle_button.dart';
 import '../bloc/breeds_bloc.dart';
 import '../bloc/breeds_event.dart';
 import '../bloc/breeds_state.dart';
@@ -76,8 +77,9 @@ class _BreedsPageState extends State<BreedsPage> {
               ],
             ),
             actions: const [
+              ThemeToggleButton(),
               Padding(
-                padding: EdgeInsets.only(right: 16),
+                padding: EdgeInsets.only(right: 16, left: 4),
                 child: LanguageToggleButton(),
               ),
             ],
@@ -119,7 +121,6 @@ class _BreedsPageState extends State<BreedsPage> {
                     child: RefreshIndicator(
                       color: Theme.of(context).colorScheme.primary,
                       onRefresh: () async {
-                        // Reset scroll position to top on manual pull-to-refresh to prevent blank scroll offsets
                         if (_scrollController.hasClients) {
                           _scrollController.animateTo(
                             0,
