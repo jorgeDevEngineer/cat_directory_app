@@ -66,11 +66,14 @@ class _BreedsPageState extends State<BreedsPage> {
             title: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  'assets/images/app_logo.jpg',
-                  height: 28,
-                  width: 28,
-                  errorBuilder: (_, __, ___) => Icon(Icons.pets, color: Theme.of(context).colorScheme.primary),
+                ClipOval(
+                  child: Image.asset(
+                    'assets/images/app_logo.jpg',
+                    height: 28,
+                    width: 28,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(Icons.pets, color: Theme.of(context).colorScheme.primary),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Text(loc.appTitle),

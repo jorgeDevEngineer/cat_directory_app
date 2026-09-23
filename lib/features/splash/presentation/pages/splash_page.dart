@@ -71,11 +71,15 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                       ),
                     ],
                   ),
-                  child: Image.asset(
-                    'assets/images/app_logo.jpg',
-                    height: 100,
-                    width: 100,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.pets_rounded, size: 80, color: AppColors.primary),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/images/app_logo.jpg',
+                      height: 90,
+                      width: 90,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(Icons.pets_rounded, size: 80, color: AppColors.primary),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
