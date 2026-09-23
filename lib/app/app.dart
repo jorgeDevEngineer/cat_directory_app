@@ -20,6 +20,8 @@ class CatDirectoryApp extends StatelessWidget {
         title: 'MiauPedia',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
         routerConfig: appRouter,
       ),
     );

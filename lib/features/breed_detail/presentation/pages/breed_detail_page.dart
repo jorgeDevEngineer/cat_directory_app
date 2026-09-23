@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../app/theme/app_colors.dart';
 import '../../../../core/di/injection.dart';
 import '../../../breeds/domain/entities/breed.dart';
 import '../cubit/breed_detail_cubit.dart';
@@ -53,11 +52,10 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
           },
           child: Text(
             widget.breedName,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryDark,
-            ),
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
           ),
         ),
       ),
@@ -74,12 +72,15 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
                   width: 90,
                   height: 90,
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
+                    color: Theme.of(context).colorScheme.surfaceContainerHighest,
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.primary, width: 2),
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.15),
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.15),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -95,10 +96,10 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
 
             // Breed info cards
             if (breed != null) ...[
-              _buildInfoRow(Icons.public_rounded, 'País de Origen', breed.country),
-              _buildInfoRow(Icons.history_edu_rounded, 'Origen', breed.origin),
-              _buildInfoRow(Icons.texture_rounded, 'Pelaje (Coat)', breed.coat),
-              _buildInfoRow(Icons.category_rounded, 'Patrón (Pattern)', breed.pattern),
+              _buildInfoRow(context, Icons.public_rounded, 'País de Origen', breed.country),
+              _buildInfoRow(context, Icons.history_edu_rounded, 'Origen', breed.origin),
+              _buildInfoRow(context, Icons.texture_rounded, 'Pelaje (Coat)', breed.coat),
+              _buildInfoRow(context, Icons.category_rounded, 'Patrón (Pattern)', breed.pattern),
             ],
 
             const SizedBox(height: 24),
@@ -109,7 +110,7 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
               builder: (context, state) {
                 return FactCard(
                   isLoading: state is BreedDetailFactLoading,
-                  fact: state is BreedDetailFactLoaded ? state.fact : null,
+                  factText: state is BreedDetailFactLoaded ? state.fact.fact : null,
                   errorMessage: state is BreedDetailFactError ? state.message : null,
                   onRetry: () => _cubit.loadRandomFact(),
                 );
@@ -131,27 +132,33 @@ class _BreedDetailPageState extends State<BreedDetailPage> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5),
+        ),
       ),
       child: Row(
         children: [
-          Icon(icon, color: AppColors.primary, size: 22),
+          Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
           const SizedBox(width: 14),
           Text(
             '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
           ),
           Expanded(
             child: Text(
               value.isNotEmpty ? value : 'N/A',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ),
         ],

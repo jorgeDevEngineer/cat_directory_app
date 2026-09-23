@@ -9,11 +9,15 @@ abstract class BreedsEvent extends Equatable {
 
 class BreedsLoadStarted extends BreedsEvent {
   final bool forceRefresh;
+  final bool isRevalidation;
 
-  const BreedsLoadStarted({this.forceRefresh = false});
+  const BreedsLoadStarted({
+    this.forceRefresh = false,
+    this.isRevalidation = false,
+  });
 
   @override
-  List<Object?> get props => [forceRefresh];
+  List<Object?> get props => [forceRefresh, isRevalidation];
 }
 
 class BreedsNextPageRequested extends BreedsEvent {
@@ -31,4 +35,13 @@ class BreedsSearchQueryChanged extends BreedsEvent {
 
   @override
   List<Object?> get props => [query];
+}
+
+class BreedsConnectivityChanged extends BreedsEvent {
+  final bool isConnected;
+
+  const BreedsConnectivityChanged(this.isConnected);
+
+  @override
+  List<Object?> get props => [isConnected];
 }

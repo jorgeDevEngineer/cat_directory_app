@@ -1,89 +1,108 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
-import '../../../../app/theme/app_colors.dart';
-import '../../data/models/cat_fact_model.dart';
 
 class FactCard extends StatelessWidget {
   final bool isLoading;
-  final CatFactModel? fact;
+  final String? factText;
   final String? errorMessage;
   final VoidCallback onRetry;
 
   const FactCard({
     super.key,
     required this.isLoading,
-    this.fact,
+    this.factText,
     this.errorMessage,
     required this.onRetry,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.primaryLight.withValues(alpha: 0.5), width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+    return Semantics(
+      label: isLoading
+          ? 'Dato curioso cargando'
+          : errorMessage != null
+              ? 'Error al cargar dato curioso'
+              : 'Dato curioso aleatorio: ${factText ?? ""}',
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardTheme.color,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3),
+            width: 1.5,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: AppColors.surfaceVariant,
-                  shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.lightbulb_rounded,
+                      color: Theme.of(context).colorScheme.primary,
+                      size: 20,
+                    ),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.lightbulb_rounded,
-                  color: AppColors.primary,
-                  size: 20,
+                const SizedBox(width: 10),
+                Text(
+                  'Dato Curioso Aleatorio',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                 ),
-              ),
-              const SizedBox(width: 10),
-              const Text(
-                'Dato Curioso Aleatorio',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primaryDark,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(width: 16),
-          const Divider(color: AppColors.border, height: 24),
-          if (isLoading) _buildShimmer(context),
-          if (!isLoading && errorMessage != null) _buildError(context),
-          if (!isLoading && fact != null) _buildFactText(context, fact!.fact),
-        ],
+              ],
+            ),
+            const SizedBox(height: 12),
+            Divider(color: Theme.of(context).dividerColor, height: 16),
+            const SizedBox(height: 8),
+            if (isLoading) _buildShimmer(context),
+            if (!isLoading && errorMessage != null) _buildError(context),
+            if (!isLoading && factText != null) _buildFactText(context, factText!),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildShimmer(BuildContext context) {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(height: 14, width: double.infinity, color: Colors.white),
-          const SizedBox(height: 8),
-          Container(height: 14, width: 220, color: Colors.white),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          height: 14,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          height: 14,
+          width: 220,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ],
     );
   }
 
@@ -93,14 +112,16 @@ class FactCard extends StatelessWidget {
       children: [
         Text(
           errorMessage ?? 'Error al cargar el dato curioso.',
-          style: const TextStyle(color: AppColors.error, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 14),
         ),
         const SizedBox(height: 12),
         TextButton.icon(
           onPressed: onRetry,
           icon: const Icon(Icons.refresh_rounded, size: 18),
           label: const Text('Reintentar'),
-          style: TextButton.styleFrom(foregroundColor: AppColors.primary),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.primary,
+          ),
         ),
       ],
     );
@@ -112,12 +133,10 @@ class FactCard extends StatelessWidget {
       child: Text(
         '"$text"',
         key: ValueKey(text),
-        style: const TextStyle(
-          fontSize: 15,
-          fontStyle: FontStyle.italic,
-          height: 1.4,
-          color: AppColors.textPrimary,
-        ),
+        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontStyle: FontStyle.italic,
+              height: 1.4,
+            ),
       ),
     );
   }

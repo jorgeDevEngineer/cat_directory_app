@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stream_transform/stream_transform.dart';
+import '../../../../core/network/connectivity_service.dart';
 import '../../domain/repositories/breeds_repository.dart';
 import 'breeds_event.dart';
 import 'breeds_state.dart';
@@ -16,19 +18,39 @@ EventTransformer<E> debounce<E>(Duration duration) {
 
 class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
   final BreedsRepository repository;
+  final ConnectivityService? connectivityService;
+  StreamSubscription<bool>? _connectivitySubscription;
 
-  BreedsBloc({required this.repository}) : super(const BreedsState()) {
+  BreedsBloc({
+    required this.repository,
+    this.connectivityService,
+  }) : super(const BreedsState()) {
     on<BreedsLoadStarted>(_onLoadStarted, transformer: droppable());
     on<BreedsNextPageRequested>(_onNextPageRequested, transformer: droppable());
     on<BreedsRefreshRequested>(_onRefreshRequested);
     on<BreedsSearchQueryChanged>(_onSearchQueryChanged, transformer: debounce(const Duration(milliseconds: 300)));
+    on<BreedsConnectivityChanged>(_onConnectivityChanged);
+
+    if (connectivityService != null) {
+      _connectivitySubscription = connectivityService!.onConnectivityChanged.listen((isConnected) {
+        add(BreedsConnectivityChanged(isConnected));
+      });
+    }
+  }
+
+  @override
+  Future<void> close() {
+    _connectivitySubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onLoadStarted(
     BreedsLoadStarted event,
     Emitter<BreedsState> emit,
   ) async {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
+    if (!event.isRevalidation) {
+      emit(state.copyWith(isLoading: true, errorMessage: null));
+    }
 
     try {
       final result = await repository.getBreeds(page: 1, forceRefresh: event.forceRefresh);
@@ -102,5 +124,16 @@ class BreedsBloc extends Bloc<BreedsEvent, BreedsState> {
       searchQuery: query,
       filteredBreeds: filtered,
     ));
+  }
+
+  Future<void> _onConnectivityChanged(
+    BreedsConnectivityChanged event,
+    Emitter<BreedsState> emit,
+  ) async {
+    if (event.isConnected && state.isFromCache) {
+      add(const BreedsLoadStarted(forceRefresh: true, isRevalidation: true));
+    } else if (!event.isConnected) {
+      emit(state.copyWith(isFromCache: true));
+    }
   }
 }

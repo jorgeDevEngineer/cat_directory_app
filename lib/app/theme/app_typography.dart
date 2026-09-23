@@ -40,4 +40,43 @@ class AppTypography {
       color: AppColors.surface,
     ),
   );
+
+  static const TextTheme darkTextTheme = TextTheme(
+    displayLarge: TextStyle(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: AppColors.darkTextPrimary,
+      letterSpacing: -0.5,
+    ),
+    displayMedium: TextStyle(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: AppColors.darkTextPrimary,
+    ),
+    titleLarge: TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w700,
+      color: AppColors.darkTextPrimary,
+    ),
+    titleMedium: TextStyle(
+      fontSize: 18,
+      fontWeight: FontWeight.w600,
+      color: AppColors.darkTextPrimary,
+    ),
+    bodyLarge: TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.normal,
+      color: AppColors.darkTextPrimary,
+    ),
+    bodyMedium: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.normal,
+      color: AppColors.darkTextSecondary,
+    ),
+    labelLarge: TextStyle(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: AppColors.darkTextPrimary,
+    ),
+  );
 }
