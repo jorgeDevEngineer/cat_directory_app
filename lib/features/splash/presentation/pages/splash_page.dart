@@ -80,7 +80,7 @@ class _SplashPageState extends State<SplashPage> with SingleTickerProviderStateM
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'PurrfectPedia',
+                  'MiauPedia',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,

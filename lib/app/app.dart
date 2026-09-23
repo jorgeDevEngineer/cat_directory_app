@@ -17,7 +17,7 @@ class CatDirectoryApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp.router(
-        title: 'PurrfectPedia',
+        title: 'MiauPedia',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         routerConfig: appRouter,

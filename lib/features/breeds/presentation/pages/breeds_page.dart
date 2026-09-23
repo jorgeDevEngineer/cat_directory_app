@@ -54,7 +54,7 @@ class _BreedsPageState extends State<BreedsPage> {
               errorBuilder: (_, __, ___) => const Icon(Icons.pets, color: AppColors.primary),
             ),
             const SizedBox(width: 8),
-            const Text('PurrfectPedia'),
+            const Text('MiauPedia'),
           ],
         ),
       ),
