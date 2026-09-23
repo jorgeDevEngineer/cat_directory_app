@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/di/injection.dart';
-import '../../breeds/domain/entities/breed.dart';
+import '../../../breeds/domain/entities/breed.dart';
 import '../cubit/breed_detail_cubit.dart';
 import '../cubit/breed_detail_state.dart';
 import '../widgets/fact_card.dart';

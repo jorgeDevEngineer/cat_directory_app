@@ -22,7 +22,6 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.background,
         elevation: 0,
-        scaffoldBackgroundColor: AppColors.background,
         centerTitle: true,
         iconTheme: IconThemeData(color: AppColors.primary),
         titleTextStyle: TextStyle(
@@ -31,7 +30,7 @@ class AppTheme {
           color: AppColors.primaryDark,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 2,
         shadowColor: AppColors.primary.withValues(alpha: 0.1),
